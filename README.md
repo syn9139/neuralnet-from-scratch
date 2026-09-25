@@ -6,7 +6,7 @@ A lightweight handwritten digit recogniser built without any ML libraries like P
 
 - Neural network built from scratch using only NumPy without ML libraries
 - Trains on the full 60000 image MNIST dataset.
-- Forward propagation, cost and back propagation derived manually
+- Forward pass, mean-squared error loss and back propagation derived manually
 - Predictions visualised via matplotlib, showing a test digit and neural network prediction side by side.
 
 ## Results
@@ -18,7 +18,7 @@ Accuracy on the 10,000-image MNIST test set using the included weights:
 | NumPy (from scratch) | **93.84%** |
 | PyTorch              | **93.55%** |
 
-The NumPy implementation successfully trains using manually derived and implemented backpropagation, without automatic differentiation or ML libraries.
+The NumPy implementation successfully trains using manually derived and implemented backpropagation, without any ML libraries.
 
 
 ## Project structure
@@ -53,6 +53,10 @@ neuralnet-from-scratch/
    ```bash
    pip install numpy matplotlib
    ```
+   or if using the script with PyTorch dependency,
+      ```bash
+   pip install numpy matplotlib torch torchvision
+   ```
 
 ### Usage
 
@@ -64,7 +68,7 @@ neuralnet-from-scratch/
 
 2. **Run predictions:**
    ```bash
-   python ocr.py
+   python guess.py
    ```
    *Loads `weights.npz` and displays sample test images with predictions.*
 
