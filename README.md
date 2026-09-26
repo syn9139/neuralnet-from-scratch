@@ -12,7 +12,6 @@ A lightweight handwritten digit recogniser built without any ML libraries like P
 - Forward propagation, cost and back propagation derived manually
 - 784 --> 16 --> 16 --> 10 MLP with ReLU hidden layers.
 - Softmax output layer with cross-entropy loss.
->>>>>>> eba28f6 (Switch to cross-entropy output + seeded shuffling)
 - Predictions visualised via matplotlib, showing a test digit and neural network prediction side by side.
 - The same neural network but with PyTorch for reference.
 
