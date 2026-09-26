@@ -6,7 +6,7 @@ A lightweight handwritten digit recogniser built without any ML libraries like P
 
 - Neural network built from scratch using only NumPy without ML libraries.
 - Trains on the full 60000 image MNIST dataset.
-- Forward pass, loss and back propagation derived manuall
+- Forward pass, loss and back propagation derived manually
 - 784 --> 16 --> 16 --> 10 MLP with ReLU hidden layers.
 - Softmax output layer with cross-entropy loss.
 - Predictions visualised via matplotlib, showing a test digit and neural network prediction side by side.
@@ -31,14 +31,18 @@ The same network was rebuilt in PyTorch as a reference. Both implementations agr
 ```text
 neuralnet-from-scratch/
 ├── README.md
-├── guess.py                   # NumPy predictions and test accuracy
-├── training.py                # Train the NumPy network
-├── weights.npz                # Saved NumPy parameters
-├── guess_with_pytorch.py      # PyTorch predictions and test accuracy
-├── training_with_pytorch.py   # Train the PyTorch network
-├── weights_with_pytorch.npz   # Saved PyTorch parameters
-└── data/                      # MNIST dataset
+├── .gitignore
+├── mlp/                           # Multilayer perceptron from scratch
+│   ├── guess.py                   # NumPy predictions and test accuracy
+│   ├── training.py                # Train the NumPy network
+│   ├── guess_with_pytorch.py      # PyTorch predictions and test accuracy
+│   ├── training_with_pytorch.py   # Train the PyTorch network
+└── data/
+    └── MNIST/raw/
+        ├── *-ubyte.gz             # Compressed MNIST dataset
 ```
+
+Weights files are not tracked, so run the training scripts before the `guess` scripts.
 
 ## Getting Started
 
@@ -67,6 +71,7 @@ neuralnet-from-scratch/
 
 1. **Train the network:**
    ```bash
+   cd mlp
    python training.py
    ```
    *Trains the model from scratch and saves the parameters to `weights.npz`.*

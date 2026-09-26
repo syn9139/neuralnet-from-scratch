@@ -1,0 +1,5 @@
+mlp/__pycache__
+mlp/weights_with_pytorch.npz
+mlp/weights.npz
+data/MNIST/raw/*
+!data/MNIST/raw/*.gz

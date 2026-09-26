@@ -1,3 +1,5 @@
+import gzip
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 np.set_printoptions(threshold=np.inf)
@@ -19,8 +21,9 @@ np.set_printoptions(threshold=np.inf)
 
 ## DATA COLLECTION
 # Import training data from MNIST
+DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 def mnist_import(filename):
-    with open('data/MNIST/raw/' + filename, 'rb') as f:
+    with gzip.open(DATA_DIR / 'MNIST' / 'raw' / (filename + '.gz'), 'rb') as f:
         return f.read()
 
 mnist_settings = {

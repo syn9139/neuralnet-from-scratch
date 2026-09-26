@@ -1,3 +1,4 @@
+from pathlib import Path
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -11,8 +12,9 @@ from torchvision import datasets # batches and shuffles the data
 # 4: Training
 
 # Load data from MNIST
+DATA_DIR = Path(__file__).resolve().parent.parent / 'data'
 def load_mnist(train):
-    ds = datasets.MNIST("data", train=train, download=True)
+    ds = datasets.MNIST(DATA_DIR, train=train, download=True)
     image = ds.data.float().view(-1, 784) / 255.0
     label = ds.targets
     return image, label
