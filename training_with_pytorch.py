@@ -1,13 +1,12 @@
 import numpy as np
 import torch
 import torch.nn.functional as F
-from torch.utils.data import DataLoader  # batches and shuffles the data
-from torchvision import datasets, transforms
+from torchvision import datasets # batches and shuffles the data
 
 # 1: Data Collection
 # 2: Neuralnet Forwardprop
 #    784(0) --> 16(1) --> 16(2) --> 10(out)
-#   a(1) = ReLU(a(0)@W(1) + b(1))
+#   a(1) = ReLU(a(0)@W(1) + b(1)
 # 3: Neuralnet Backprop
 # 4: Training
 
@@ -21,12 +20,27 @@ def load_mnist(train):
 train_image, train_label = load_mnist(True) 
 test_image, test_label = load_mnist(False)
 
+# Set seed
+def setseed(s):
+    # Reassigns the module-level training data, not local copies
+    global train_image, train_label
+    g = torch.Generator().manual_seed(s)
+
+    # Shuffle input data
+    perm = torch.randperm(train_image.shape[0], generator=g)
+    train_image = train_image[perm]
+    train_label = train_label[perm]
+    return g
+
+seed = 2147483647
+g = setseed(seed)
+
 # Define the MLP forward pass w/ Kaiming initialisation
-W1 = (torch.randn(784, 16) * np.sqrt(2 / 784))
+W1 = (torch.randn(784, 16, generator=g) * np.sqrt(2 / 784))
 b1 = torch.zeros(16)
-W2 = (torch.randn(16, 16) * np.sqrt(2 / 16))
+W2 = (torch.randn(16, 16, generator=g) * np.sqrt(2 / 16))
 b2 = torch.zeros(16)
-W3 = (torch.randn(16, 10) * np.sqrt(2 / 16))
+W3 = (torch.randn(16, 10, generator=g) * np.sqrt(2 / 16))
 b3 = torch.zeros(10)
 
 params = [W1, b1, W2, b2, W3, b3]
@@ -39,28 +53,25 @@ def forward_pass(data):
     logits = h2 @ W3 + b3
     return logits
 
-def backprop(data, labels):
-    logits = forward_pass(data)
-    output = torch.sigmoid(logits)
+def backprop(data, labels): 
     # reset previous gradients
     for p in params: 
         p.grad = None
 
-    # create one-hot expectation tensor
-    expected = F.one_hot(train_label[x*batch:x*batch+batch], num_classes=10).float()
-    loss = ((output - expected)**2).sum(dim=1).mean()
+    logits = forward_pass(data)
+    loss = F.cross_entropy(logits, labels)
+    
     loss.backward()
-
-
-    for p in params:
-        p.data += -0.1 * p.grad 
 
 # Do SGD
 batch = 100
 if __name__ == "__main__":
-    for _ in range(10):
+    for epoch in range(10):
+        setseed(seed + epoch) # shuffle data
         for x in range(600):
             backprop(train_image[x*batch:x*batch+batch], train_label[x*batch:x*batch+batch])
+            for p in params:
+                p.data += -0.1 * p.grad 
 
     # Save the weights to a file
     np.savez('weights_with_pytorch.npz', *[p.detach().cpu().numpy() for p in params])

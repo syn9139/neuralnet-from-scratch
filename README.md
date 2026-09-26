@@ -4,10 +4,17 @@ A lightweight handwritten digit recogniser built without any ML libraries like P
 
 ## Features
 
-- Neural network built from scratch using only NumPy without ML libraries
+- Neural network built from scratch using only NumPy without ML libraries.
 - Trains on the full 60000 image MNIST dataset.
+<<<<<<< HEAD
 - Forward pass, mean-squared error loss and back propagation derived manually
+=======
+- Forward propagation, cost and back propagation derived manually
+- 784 --> 16 --> 16 --> 10 MLP with ReLU hidden layers.
+- Softmax output layer with cross-entropy loss.
+>>>>>>> eba28f6 (Switch to cross-entropy output + seeded shuffling)
 - Predictions visualised via matplotlib, showing a test digit and neural network prediction side by side.
+- The same neural network but with PyTorch for reference.
 
 ## Results
 
@@ -15,10 +22,12 @@ Accuracy on the 10,000-image MNIST test set using the included weights:
 
 | Implementation       |   Accuracy |
 | -------------------- | ---------: |
-| NumPy (from scratch) | **93.84%** |
-| PyTorch              | **93.55%** |
+| NumPy (from scratch) | **95.26%** |
+| PyTorch              | **94.92%** |
 
 The NumPy implementation successfully trains using manually derived and implemented backpropagation, without any ML libraries.
+
+The same neural network was recreated with PyTorch, and accuracy compared against. Both reach about 95% test accuracy. The small difference comes from different random initialisations and shuffling, not from the implementations.
 
 
 ## Project structure

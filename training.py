@@ -7,7 +7,7 @@ np.set_printoptions(threshold=np.inf)
 # 
 # 2: Neuralnet Forwardprop
 #    784(0) --> x(1) --> x(2) --> 10(out)
-#   a(1) = ReLU(W(1)@a(0) + b(1))
+#   a(1) = ReLU(a(0)@W(1)) + b(1))
 # 3: Neuralnet Backprop
 #   i. Pick 100 random datapoints
 #   ii. Calculate cost
@@ -53,6 +53,21 @@ train_label_data = mnist_dataset['train-labels-idx1-ubyte'].squeeze().astype(int
 test_img_data = mnist_dataset['t10k-images-idx3-ubyte']
 test_label_data = mnist_dataset['t10k-labels-idx1-ubyte'].squeeze().astype(int)
 
+# Set seed
+def setseed(s):
+    # Reassigns the module-level training data, not local copies
+    global train_img_data, train_label_data
+    rng = np.random.default_rng(s)
+
+    # Shuffle input data
+    perm = rng.permutation(train_img_data.shape[1])
+    train_img_data = train_img_data[:, perm]
+    train_label_data = train_label_data[perm]
+    return rng
+
+seed = 2147483647
+rng = setseed(seed)
+
 ##
 ## NEURAL NETWORK DEFINITION
 ##
@@ -62,20 +77,19 @@ test_label_data = mnist_dataset['t10k-labels-idx1-ubyte'].squeeze().astype(int)
 # Define neuralnet special functions
 def ReLU(z):
     return np.maximum(0, z)
-def sigmoid(z):
-  return 1 / (1 + np.exp(-z))
-def dsigmoid(z):
-  s = sigmoid(z)
-  return s * (1 - s)
+def softmax(z):
+    e = np.exp(z - z.max(axis=1, keepdims=True))  
+    return e / e.sum(axis=1, keepdims=True)
 
-# Initialise some random 16x784 weight matrix W1 and no bias: dim784 to dim16
-W1 = np.random.randn(784, 16) * np.sqrt(2 / 784)
+
+# Initialise some random 784x16 weight matrix W1 and 0 bias: dim784 to dim16
+W1 = rng.standard_normal((784, 16)) * np.sqrt(2 / 784)
 b1 = np.zeros((1, 16))
-# Initialise some random 16x16 weight matrix W2 and no bias: dim16 to dim16
-W2 = np.random.randn(16, 16) * np.sqrt(2 / 16)
+# Initialise some random 16x16 weight matrix W2 and 0 bias: dim16 to dim16
+W2 = rng.standard_normal((16, 16)) * np.sqrt(2 / 16)
 b2 = np.zeros((1, 16))
-# Initialise some random 10x16 weight matrix W2 and no bias: dim16 to dim10
-W3 = np.random.randn(10, 16) * np.sqrt(2 / 16)
+# Initialise some random 16x10 weight matrix W3 and 0 bias: dim16 to dim10
+W3 = rng.standard_normal((16, 10)) * np.sqrt(2 / 16)
 b3 = np.zeros((1, 10))
 params = [W1, b1, W2, b2, W3, b3]
 
@@ -88,8 +102,8 @@ def forward(data):
     z2 = a1 @ W2 + b2
     a2 = ReLU(z2)
     # Layer 2 --> Layer Out
-    z3 = a2 @ W3.T + b3
-    a3 = sigmoid(z3)
+    z3 = a2 @ W3 + b3
+    a3 = softmax(z3)
     return a0, z1, a1, z2, a2, z3, a3
 
 
@@ -99,30 +113,26 @@ def backprop(x):
     # Pick 100 datapoints, starting from the beginning of the training set
     subset_img = train_img_data[:, x*100 : x*100 + 100]
     subset_label = train_label_data[x*100 : x*100 + 100]
-    # Convert labels to a 10x100 matrix
-    desired_output = np.zeros((10, 100))
-    desired_output[subset_label, np.arange(100)] = 1
+    # Convert labels to a 100x10 one-hot matrix
+    desired_output = np.zeros((100, 10))
+    desired_output[np.arange(100), subset_label] = 1
     # Import current neuron values
     a0, z1, a1, z2, a2, z3, a3 = forward(subset_img)
-
-    # Find costs
-    # cost_list = np.sum((a3 - desired_output)**2, axis=0)
-    # cost_avg = np.mean(cost_list)
 
     # dC_0/dW = dC_0/da da/dz dz/dW || Keep in mind that these are all vectors with 100 derivatives
     #         =    delta_i    dz/dW
     # Output --> Layer 3
-    delta3 = 2*(a3 - desired_output.T) * dsigmoid(z3)
-    dz_dW3 = a2
-    dC_dW3 = delta3.T @ dz_dW3 / 100
- 
+    delta3 = a3 - desired_output
+    dz_dW3 = a2.T
+    dC_dW3 = dz_dW3 @ delta3 / 100
+
     # Layer 3 --> Layer 2
-    delta2 = delta3 @ W3 * np.heaviside(z2, 1)
+    delta2 = delta3 @ W3.T * np.heaviside(z2, 0)
     dz_dW2 = a1.T
     dC_dW2 = dz_dW2 @ delta2 / 100
- 
+
     # Layer 2 --> Layer 1
-    delta1 = delta2 @ W2.T * np.heaviside(z1, 1)
+    delta1 = delta2 @ W2.T * np.heaviside(z1, 0)
     dz_dW1 = a0.T
     dC_dW1 = dz_dW1 @ delta1 / 100
 
@@ -132,17 +142,16 @@ def backprop(x):
         dC_dW2, np.mean(delta2, axis=0, keepdims=True),
         dC_dW3, np.mean(delta3, axis=0, keepdims=True),
     ]
+    return grads
 
-    # SGD
-    for p, grad in zip(params, grads):
-        p -= 0.1 * grad
-
-# Train!!!
-# Only runs on this file
+# SGD
 if __name__ == "__main__":
-    for _ in range(10):
+    for epoch in range(10):
+        setseed(seed + epoch) # shuffle data
         for i in range(600): # 600 x 100 training pictures
-            backprop(i)
+            grads = backprop(i)
+            for p, grad in zip(params, grads):
+                p -= 0.1 * grad
  
     np.savez(
         'weights.npz',

@@ -10,7 +10,7 @@ with torch.no_grad():
     for i, p in enumerate(params):
         p.copy_(torch.from_numpy(data[f'arr_{i}']))
     logits = forward_pass(test_image[sample])
-    output = torch.sigmoid(logits)
+    output = torch.softmax(logits, dim=-1)
 
  
 # Show actual image and prediction
@@ -27,6 +27,6 @@ plt.show()
 
 # Calculate success rate
 with torch.no_grad():
-    predictions = torch.sigmoid(forward_pass(test_image)).argmax(dim=1)
+    predictions = torch.softmax(forward_pass(test_image), dim=-1).argmax(dim=1)
     success_rate = (predictions == test_label).float().mean().item() * 100
 print(f"Success rate: {success_rate:.2f}%")
