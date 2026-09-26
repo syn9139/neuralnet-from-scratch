@@ -19,17 +19,17 @@ def load_mnist(train):
 
 train_image, train_label = load_mnist(True) 
 test_image, test_label = load_mnist(False)
+train_image0, train_label0 = train_image, train_label
 
 # Set seed
 def setseed(s):
-    # Reassigns the module-level training data, not local copies
     global train_image, train_label
     g = torch.Generator().manual_seed(s)
 
     # Shuffle input data
-    perm = torch.randperm(train_image.shape[0], generator=g)
-    train_image = train_image[perm]
-    train_label = train_label[perm]
+    perm = torch.randperm(train_image0.shape[0], generator=g)
+    train_image = train_image0[perm]
+    train_label = train_label0[perm]
     return g
 
 seed = 2147483647
@@ -65,13 +65,14 @@ def backprop(data, labels):
 
 # Do SGD
 batch = 100
+lr = 0.1
 if __name__ == "__main__":
     for epoch in range(10):
         setseed(seed + epoch) # shuffle data
         for x in range(600):
             backprop(train_image[x*batch:x*batch+batch], train_label[x*batch:x*batch+batch])
             for p in params:
-                p.data += -0.1 * p.grad 
+                with torch.no_grad(): p -= lr * p.grad
 
     # Save the weights to a file
     np.savez('weights_with_pytorch.npz', *[p.detach().cpu().numpy() for p in params])

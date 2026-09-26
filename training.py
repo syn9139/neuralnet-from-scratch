@@ -52,18 +52,18 @@ train_img_data = mnist_dataset['train-images-idx3-ubyte']
 train_label_data = mnist_dataset['train-labels-idx1-ubyte'].squeeze().astype(int)
 test_img_data = mnist_dataset['t10k-images-idx3-ubyte']
 test_label_data = mnist_dataset['t10k-labels-idx1-ubyte'].squeeze().astype(int)
+train_img_data0, train_label_data0 = train_img_data, train_label_data
 
 # Set seed
 def setseed(s):
-    # Reassigns the module-level training data, not local copies
-    global train_img_data, train_label_data
+    global train_img_data, train_label_data        
     rng = np.random.default_rng(s)
 
     # Shuffle input data
-    perm = rng.permutation(train_img_data.shape[1])
-    train_img_data = train_img_data[:, perm]
-    train_label_data = train_label_data[perm]
-    return rng
+    perm = rng.permutation(train_img_data0.shape[1])
+    train_img_data = train_img_data0[:, perm]     
+    train_label_data = train_label_data0[perm]      
+    return rng        
 
 seed = 2147483647
 rng = setseed(seed)
@@ -145,13 +145,14 @@ def backprop(x):
     return grads
 
 # SGD
+lr = 0.1
 if __name__ == "__main__":
     for epoch in range(10):
         setseed(seed + epoch) # shuffle data
         for i in range(600): # 600 x 100 training pictures
             grads = backprop(i)
             for p, grad in zip(params, grads):
-                p -= 0.1 * grad
+                p -= lr * grad
  
     np.savez(
         'weights.npz',
