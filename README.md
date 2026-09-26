@@ -17,16 +17,16 @@ A lightweight handwritten digit recogniser built without any ML libraries like P
 
 ## Results
 
-Accuracy on the 10,000-image MNIST test set using the included weights:
+Mean + standard deviation on the 10,000-image MNIST test set using 10 random seeds:
 
 | Implementation       |   Accuracy |
 | -------------------- | ---------: |
-| NumPy (from scratch) | **95.26%** |
-| PyTorch              | **94.92%** |
+| NumPy (from scratch) | **(95.00 ± 0.27)%** |
+| PyTorch              | **(95.07 ± 0.31)%** |
 
 The NumPy implementation successfully trains using manually derived and implemented backpropagation, without any ML libraries.
 
-The same neural network was recreated with PyTorch, and accuracy compared against. Both reach about 95% test accuracy. The small difference comes from different random initialisations and shuffling, not from the implementations.
+The same network was rebuilt in PyTorch as a reference. Both implementations agree within the variation caused by random initialisation and data shuffling.
 
 
 ## Project structure
