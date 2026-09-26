@@ -6,9 +6,7 @@ A lightweight handwritten digit recogniser built without any ML libraries like P
 
 - Neural network built from scratch using only NumPy without ML libraries.
 - Trains on the full 60000 image MNIST dataset.
-<<<<<<< HEAD
 - Forward pass, mean-squared error loss and back propagation derived manually
-=======
 - Forward propagation, cost and back propagation derived manually
 - 784 --> 16 --> 16 --> 10 MLP with ReLU hidden layers.
 - Softmax output layer with cross-entropy loss.
