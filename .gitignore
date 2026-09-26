@@ -3,3 +3,6 @@ mlp/weights_with_pytorch.npz
 mlp/weights.npz
 data/MNIST/raw/*
 !data/MNIST/raw/*.gz
+data/EMNIST/
+optimisers/weights.npz
+optimisers/__pycache__
