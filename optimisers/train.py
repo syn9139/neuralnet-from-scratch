@@ -11,7 +11,7 @@ batch = 100
 lr = 0.001
 # opt = ManualSGD(params, lr=lr)
 # opt = ManualSGDMomentum(params, lr=lr, momentum=0.9)
-# opt = ManualAdamW(params, lr=lr)
+opt = ManualAdamW(params, lr=lr)
 # opt = torch.optim.SGD(params, lr=lr)
 # opt = torch.optim.SGD(params, lr=lr, momentum=0.9)
 # opt = torch.optim.AdamW(params, lr=lr)
