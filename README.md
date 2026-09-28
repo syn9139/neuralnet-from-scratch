@@ -98,7 +98,7 @@ neuralnet-from-scratch/
 
 2. **Run predictions:**
    ```bash
-   python guess.py
+   python test.py
    ```
    *Loads `weights.npz` and displays sample test images with predictions.*
 
